@@ -1,0 +1,9 @@
+{
+    "dataFiles": "DataFiles",
+    "infoFiles":"InfoFiles",
+    "start" : 1700,
+    "end" : 2100,
+    "treshold" : 900,
+    "specStart" : 0,
+    "specEnd"   : 2e13
+}
