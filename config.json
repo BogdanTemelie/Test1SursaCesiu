@@ -3,6 +3,10 @@
     "infoFiles":"InfoFiles",
     "start" : 1700,
     "end" : 2100,
+    "startCo1" : 3100 ,
+    "endCo1" : 3500,
+    "startCo2" : 3500,
+    "endCo2" : 3900,
     "treshold" : 900,
     "specStart" : 0,
     "specEnd"   : 2e13

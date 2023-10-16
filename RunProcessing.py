@@ -46,11 +46,13 @@ def getPeak(hist, start, end): #Scoate niste parametrii preliminari pentru a fit
         baseline = np.append(baseline, hist.GetBinContent(i))
     bslValue = np.sum(baseline) / len(baseline)
     offset = 50
-    treshold = float(hist.GetMaximum())*0.9
+    hist.GetXaxis().SetRange(start, end)
+    treshold = float(hist.GetMaximum())*0.8
+    print('treshold= ', treshold)
     for i in range(start, end):
         dif1 = offset + hist.GetBinContent(i) - bslValue
         dif2 = offset + hist.GetBinContent(i+1) - bslValue +  0.05*(offset + hist.GetBinContent(i+1) - bslValue)
-        # print('dif1 = ', dif1, "dif2 = ", dif2)
+        print('dif1 = ', dif1, "dif2 = ", dif2)
         if dif2 < dif1 and dif1 > treshold and dif2 > treshold:
             height = hist.GetBinContent(i)
             mean = hist.GetBinCenter(i)
@@ -157,31 +159,65 @@ def analyseFiles(files): #Scoate parametrii doriti din fisierele de tip list de 
                         histCh0.Fill(int(event[-2]))
                     if event[-3] == '32':
                         histCh32.Fill(int(event[-2]))
-            
+            histCh0Co1 = histCh0.Clone()
+            histCh0Co2 = histCh0.Clone()
+            histCh32Co1 = histCh32.Clone()
+            histCh32Co2 = histCh32.Clone()
+
             par0 = getPeak(histCh0, histCh0.FindBin(config['start']), histCh0.FindBin(config['end']))
             par32 = getPeak(histCh32, histCh32.FindBin(config['start']), histCh32.FindBin(config['end']))
+            parCh0Co1 = getPeak(histCh0Co1, histCh0.FindBin(config['startCo1']), histCh0.FindBin(config['endCo1']))
+            parCh0Co2 = getPeak(histCh0Co2, histCh0.FindBin(config['startCo2']), histCh0.FindBin(config['endCo2']))
+            parCh32Co1 = getPeak(histCh32Co1, histCh0.FindBin(config['startCo1']), histCh0.FindBin(config['endCo1']))
+            parCh32Co2 = getPeak(histCh32Co2, histCh0.FindBin(config['startCo2']), histCh0.FindBin(config['endCo2']))
+ 
             print(par0)
             print(par32)
+            print(parCh0Co1)
+            print(parCh0Co2)
+            print(parCh32Co1)
+            print(parCh32Co2)
+
             fitFunc0 = fit(histCh0, par0, config['start'], config['end'])
             fitFunc32 = fit(histCh32, par32, config['start'], config['end'])
+            fitfuncCh0Co1 = fit(histCh0Co1, parCh0Co1, config['startCo1'], config['endCo1'])
+            fitfuncCh0Co2 = fit(histCh0Co2, parCh0Co2, config['startCo2'], config['endCo2'])
+            fitfuncCh32Co1 = fit(histCh32Co1, parCh32Co1, config['startCo1'], config['endCo1'])
+            fitfuncCh32Co2 = fit(histCh32Co2, parCh32Co2, config['startCo2'], config['endCo2'])
 
             totalCounts0 = integrate(histCh0, config['specStart'], config['specEnd'])
             totalCounts32 = integrate(histCh0, config['specStart'], config['specEnd'])
 
-            # Ch0 = TCanvas('c1', "Channel 0")
-            # Ch32 = TCanvas('c2', 'Channel 32')
+            Ch0 = TCanvas('c1', "Channel 0")
+            Ch32 = TCanvas('c2', 'Channel 32')
 
-            # Ch0.cd()
-            # histCh0.Draw('hist')
-            # histCh0.Fit(fitFunc0, "R")
-            # fitFunc0.Draw("same")
-            
-            # Ch32.cd()
-            # histCh32.Draw('hist')
-            # histCh32.Fit(fitFunc32, "R")
-            # fitFunc32.Draw('same')
+            Ch0.cd()
+            histCh0.Draw('hist')
+            histCh0.Fit(fitFunc0, "R")
+            fitFunc0.Draw("same")
+
+            histCh0Co1.Draw('same')
+            histCh0Co1.Fit(fitfuncCh0Co1, "R")
+            fitfuncCh0Co1.Draw('same')
+
+            histCh0Co2.Draw('same')
+            histCh0Co2.Fit(fitfuncCh0Co2, "R")
+            fitfuncCh0Co2.Draw('same')
+
+            Ch32.cd()
+            histCh32.Draw('hist')
+            histCh32.Fit(fitFunc32, "R")
+            fitFunc32.Draw('same')
+
+            histCh32Co1.Draw('same')
+            histCh32Co1.Fit(fitfuncCh32Co1, "R")
+            fitfuncCh32Co1.Draw('same')
+
+            histCh32Co2.Draw('same')
+            histCh32Co2.Fit(fitfuncCh32Co2, "R")
+            fitfuncCh32Co2.Draw('same')    
            
-            # gPad.WaitPrimitive('ggg')
+            gPad.WaitPrimitive('ggg')
             
             rez0 = fitFunc0.GetParameter(2) 
             rez32 = fitFunc32.GetParameter(2) 
@@ -244,7 +280,7 @@ def plotGraphs(parms1, parms2, parms3): #Ploteaza mai multe grafice
 # plot(config['dataFiles'])
 info = getInfo(config['infoFiles'])
 parameters = analyseFiles(config['dataFiles'])
-plotGraphs(info, parameters[0], parameters[1])
+# plotGraphs(info, parameters[0], parameters[1])
 
 
 
